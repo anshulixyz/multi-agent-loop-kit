@@ -1,0 +1,21 @@
+---
+description: Repo context and read order
+alwaysApply: true
+---
+
+# Repo context
+
+This repo uses a multi-agent workflow with worktrees, path ownership, journals, proposals, approvals, and a Beacon loop layer.
+
+Read in this order:
+
+1. `AGENTS.md`
+2. `OPERATING_GUIDE.md`
+3. `PROTOCOL.md`
+4. `PROTOCOL.md`
+5. `LOOP_RADAR.md`
+6. `LOOP_MEMORY.md`
+7. your own journal in `agents-status/<codename>.md`
+8. relevant task briefs and approvals
+
+Never assume you can edit a file until you check ownership.

@@ -1,0 +1,43 @@
+---
+description: Branch, commit, and PR conventions
+alwaysApply: true
+---
+
+# Commit style
+
+Branch:
+
+```txt
+<codename>/<slug>
+```
+
+Commit:
+
+```txt
+<codename>: <imperative lowercase message>
+```
+
+PR title:
+
+```txt
+<Codename>: <Title case summary>
+```
+
+PR body must include:
+
+- What changed
+- Why now
+- Owned paths touched
+- Approval/proposal link if relevant
+- Tests run
+- Coordination impact
+- Remaining work
+
+Before PR:
+
+```bash
+bun typecheck
+bun test
+```
+
+Adapt commands to the repo’s package manager.

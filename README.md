@@ -1,0 +1,247 @@
+# Multi-Agent Loop Kit
+
+**An agent-native setup kit for turning a well-scoped repo into a supervised
+multi-agent coding loop.** A markdown + bash protocol that lets an AI agent
+configure your existing repo for parallel coding agents, Beacon loop planning,
+approval-gated task briefs, worktree isolation, journals, PRs, and safe
+auto-mode.
+
+It is **not** unattended autonomy. It's structured, human-approved auto-mode for
+repos with clear specs and separable work.
+
+**The pitch in one line:** set your agents up once, then a loop feeds them
+ongoing work — instead of you re-prompting them every few minutes. This is a kit
+for *building multi-agent loops*, not for babysitting agents.
+
+**Three modes, building on each other:**
+
+1. **Setup mode** — an agent reads your repo, interviews you, and configures the
+   kit (ownership, prompts, radar) for your project.
+2. **Loop mode** — Beacon reads repo state and proposes the next work; agents
+   claim approved tasks; you approve; they build and PR.
+3. **Safe auto-mode** — approved agents keep working through their owned, numbered
+   slices until a stop condition, without you re-prompting each step.
+
+It is **not** unattended autonomy. It's a repo protocol that gives agents enough
+structure to work continuously under your approval. See
+[`docs/AUTO_MODE.md`](docs/AUTO_MODE.md) for exactly what "safe auto-mode" allows
+and forbids.
+
+> Works with Cursor, Claude Code, Codex, Windsurf, or any AI tool that can read
+> repo files and follow a prompt. No daemon and no runtime dependency — the kit
+> is markdown + bash. The `package.json` shortcuts (`bun run …`) are optional
+> conveniences; every command also runs directly as `bash tools/…`. MIT.
+
+---
+
+## How it works (the whole flow)
+
+```mermaid
+flowchart TD
+    A[Your repo] --> B["Point your agent at<br/>prompts/setup-interview.md"]
+    B --> C{"Agent interviews you:<br/>• what are you building?<br/>• how does the code split?<br/>• what's frozen?"}
+    C --> D["Agent generates AGENTS.md,<br/>one prompt per agent,<br/>ownership rules, LOOP_RADAR.md"]
+    D --> E[You approve the setup]
+    E --> F([The loop runs])
+    F --> G["Beacon ranks what's next"]
+    G --> H["An agent claims it,<br/>requests approval"]
+    H --> I[You approve]
+    I --> J["Agent builds in its own<br/>worktree → tests → PR"]
+    J --> G
+```
+
+One non-coding agent (**Beacon**) ranks what matters next. Coding agents each own
+a slice of the repo and build only what's approved. You (the **Project Lead**)
+are the approval gate the whole way around.
+
+For the full method see **[`OPERATING_GUIDE.md`](OPERATING_GUIDE.md)**; for the
+concepts and rules see **[`PROTOCOL.md`](PROTOCOL.md)**.
+
+---
+
+## Where an agent starts
+
+There is exactly one entry point. Hand your coding agent this:
+
+```txt
+Read prompts/setup-interview.md and follow it. Interview me, then propose the
+setup. Don't start any agents or create worktrees until I approve.
+```
+
+That file tells the agent what the kit is, how to read your repo, what to ask
+you, and what to generate — stopping for your approval before anything
+irreversible. (Cursor / Claude Code / Codex read `AGENTS.md` automatically,
+which points here too.) Per-tool prompts are in
+[`docs/INSTALL_WITH_YOUR_AGENT.md`](docs/INSTALL_WITH_YOUR_AGENT.md).
+
+---
+
+## What changes in your repo
+
+The kit is additive. Your code, build, and CI are untouched; you gain a
+coordination layer:
+
+```txt
+your-repo/
+├── apps/ packages/ ...      # YOUR code — unchanged, now split into owned paths
+├── AGENTS.md                # NEW · who owns which paths (the source of truth)
+├── LOOP_RADAR.md            # NEW · ranked "what's next" (Beacon writes this)
+├── LOOP_MEMORY.md           # NEW · durable decisions and lessons
+├── prompts/                 # NEW · one prompt per agent + Beacon
+├── agents-status/           # NEW · journals, approvals, proposals, task briefs
+├── .cursor/rules/           # NEW · ownership + loop rules your tools read
+└── tools/                   # NEW · status / standup / spawn scripts
+```
+
+After setup, each agent has a codename, an owned path, a prompt, a journal, and
+its own git worktree. Nothing runs autonomously — you approve every build.
+
+---
+
+## Quickstart
+
+### A. New / empty repo (recommended starting point)
+
+Easiest way to learn the kit is on a fresh repo where nothing can conflict.
+
+```bash
+# use this repo as a GitHub template ("Use this template"), or clone it:
+git clone <KIT_REPO_URL> my-loop-repo
+cd my-loop-repo
+# optional: `npx degit <KIT_REPO_URL> my-loop-repo` for a history-free copy
+```
+
+Then point your agent at `prompts/setup-interview.md` (see above) and follow the
+interview.
+
+### B. Existing repo
+
+Use the safe installer — it never overwrites your files (collisions are saved as
+`<name>.loopkit` to merge, and your `package.json` is left alone):
+
+```bash
+bash /path/to/kit/scripts/install-into-repo.sh /path/to/your-repo
+```
+
+See **[Will it conflict with my repo?](#will-it-conflict-with-my-repo)** below.
+
+---
+
+## Running it & seeing status
+
+Beacon is just an AI session with `prompts/beacon.md` loaded — you open it at
+loop boundaries (session start, after merges, when an agent is blocked), not on a
+timer. It ranks work into `LOOP_RADAR.md`; agents pick it up; you approve; they
+build. One command shows you the whole board:
+
+```bash
+bun run status     # every agent: branch, last update (+ stale flag), now / blocked / next
+bun run loop       # status board → scan → radar → standup, in one shot
+```
+
+Agents report by writing their journals (`agents-status/<codename>.md`), so you
+never ask for a status — you read it. Full operator workflow, the Beacon cadence,
+and every status command are in **[`OPERATING_GUIDE.md`](OPERATING_GUIDE.md)**.
+
+---
+
+## Prerequisites
+
+### The one that actually matters: a real plan
+
+This kit coordinates *execution*. It does **not** decide what to build. Before you
+run a single agent, you need the project to be genuinely well-specified:
+
+- **A project plan** — what you're building and the slices to get there.
+- **A tech spec** — stack, data models/contracts, the APIs and modules each agent
+  will own. Agents read this; it's what makes their work concrete instead of
+  invented. (In practice each agent's prompt points at the relevant spec
+  sections — see `examples/` and `prompts/coding-agent.md`.)
+- **Clearly defined goals** — one concrete objective the loop optimizes toward.
+- **Ideally: UI specs + a design system** — if there's a frontend, the agents
+  building it need the screens, components, and tokens defined, or they'll each
+  invent their own and you'll spend the loop reconciling.
+
+This is for projects that are **clear to develop**. If the spec changes hourly or
+the goals are fuzzy, the loop will amplify the confusion across N agents instead
+of one. Plan first, loop second. The richer the spec, the more the agents can do
+without re-prompting — which is the whole point. (Don't have a spec yet? See
+[`docs/PREPARING_YOUR_SPEC.md`](docs/PREPARING_YOUR_SPEC.md) for what "ready"
+looks like.)
+
+### Tooling
+
+- **git 2.7+** (the model uses `git worktree`)
+- **bash** (macOS, Linux, or WSL/Git Bash)
+- **An AI coding tool** that reads repo files and follows a prompt
+
+Optional: a JS runtime (`bun`/`npm`) only for the `run` script shortcuts — they
+just wrap `bash tools/...`, so you can run them directly; and `gh` to also list
+PRs in standup.
+
+---
+
+## Do I even need this?
+
+It pays off when work can be partitioned by path — multiple surfaces, clear
+boundaries, enough work for 2–5 agents, and a human willing to review. It's
+overhead when the repo is tiny, the work is one short fix, or ownership can't be
+drawn. If your work is mostly cross-cutting, use fewer agents — or one — until it
+isn't. (`PROTOCOL.md` has the full "when this fits" discussion.)
+
+> This kit may work very well for your repo, or it may not. It works for my own
+> AI/product projects because the work can be planned, partitioned, reviewed, and
+> looped with human approval.
+
+---
+
+## Will it conflict with my repo?
+
+Not if you use the installer (`scripts/install-into-repo.sh`) — it never
+overwrites a file you already have. The only file most repos already own is
+`AGENTS.md` (common for agent tooling); the installer keeps yours and writes
+`AGENTS.md.loopkit` beside it to merge. Shared dirs (`.github/`, `.cursor/`,
+`tools/`, `docs/`) are merged file-by-file, adding only what's new. The kit's
+own reference docs (this README, `PROTOCOL.md`, examples, the snapshot) are
+**not** copied into your repo — they live in the kit. So adoption is additive:
+your README, build, license, and CI stay exactly as they are.
+
+---
+
+## What's in here
+
+| Path | What it is |
+|---|---|
+| [`OPERATING_GUIDE.md`](OPERATING_GUIDE.md) | **The method** — step by step: break work into agents, write prompts, run the loop, check status |
+| [`RUNBOOK.md`](RUNBOOK.md) | **When reality deviates** — a scenario playbook (contract gap, stuck agent, finished early, demo failure, …) as trigger → who decides → steps |
+| [`PROTOCOL.md`](PROTOCOL.md) | The concepts and rules: pillars, loop, authority split, task-brief vs proposal, states |
+| [`docs/PREPARING_YOUR_SPEC.md`](docs/PREPARING_YOUR_SPEC.md) | Is your project ready to loop? The plan/spec/design-system checklist to do **before** you start |
+| [`docs/AUTO_MODE.md`](docs/AUTO_MODE.md) | What "safe auto-mode" lets an agent do, what it forbids, and the stop conditions |
+| [`AGENTS.md`](AGENTS.md) | The ownership registry (you fill this in for your repo) |
+| `prompts/` | `setup-interview.md` (start here), `beacon.md`, `coding-agent.md`, `operator.md` |
+| `agents-status/` | Journal, approval, proposal, and task-brief templates |
+| `tools/`, `scripts/` | Status/standup/spawn helpers and the safe installer |
+| [`examples/`](examples/) | Worked repos — see below |
+| `docs/` | Agent-install prompts, naming strategy, future integrations |
+
+---
+
+## Examples
+
+The real value is seeing a repo structured for multiple agents. Two are included:
+
+- [`examples/web-api-shared/`](examples/web-api-shared/) — a generic
+  `web + api + shared-types` repo with 3 agents. Start here; it's the simplest
+  honest shape.
+- [`examples/intent-pad/`](examples/intent-pad/) — a richer 5-agent product, with
+  a fully worked loop iteration ([`WALKTHROUGH.md`](examples/intent-pad/WALKTHROUGH.md))
+  showing radar → task brief → approval → journal → memory, plus a worked
+  proposal for the cross-cutting case.
+
+---
+
+## Contributing & license
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). MIT licensed. Issues with your repo
+shape, agent count, tool, and OS are very welcome — that's how the kit gets more
+portable.

@@ -1,0 +1,26 @@
+---
+description: Frozen contract rules
+alwaysApply: true
+---
+
+# Frozen contracts
+
+Shared contracts/types/schemas are operator-owned.
+
+Default contract paths:
+
+- `packages/types/**`
+- `packages/*-types/**`
+- `schemas/**`
+- `openapi/**`
+- `proto/**`
+
+Rules:
+
+1. Coding agents must not edit contracts unless explicitly approved.
+2. Contract changes require a proposal.
+3. The operator decides contract changes.
+4. All consumers must import from the shared contract package.
+5. Do not create local workaround types that hide drift.
+6. Run typecheck after contract changes.
+7. Broadcast contract bumps through journal/proposal/standup.

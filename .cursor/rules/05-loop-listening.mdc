@@ -1,0 +1,67 @@
+---
+description: Beacon loop listening rules
+alwaysApply: true
+---
+
+# Loop listening rules
+
+Every coding agent must read:
+
+1. `LOOP_RADAR.md`
+2. `agents-status/task-briefs/*.md`
+3. `agents-status/approvals/*.md`
+4. its own journal
+
+Agents may self-select tasks only when:
+
+1. The task touches only their owned paths.
+2. The task aligns with the current build objective.
+3. The task has no unresolved contract/schema decision.
+4. The task does not conflict with another open PR.
+5. The task has operator approval if approval is required.
+
+---
+
+## Agent response protocol
+
+When a task is relevant, do not start coding immediately if approval is required.
+
+First create or update:
+
+`agents-status/approvals/NNN-<agent>-<task>.md`
+
+Then add to your journal:
+
+`[approval] operator: agents-status/approvals/NNN-<agent>-<task>.md`
+
+---
+
+## Safe maintenance exception
+
+Agents may proceed without approval only for:
+
+- updating their own journal
+- fixing typos in owned docs
+- adding missing test notes
+- fixing clearly broken formatting
+- running read-only scans
+
+Anything that changes product behavior requires approval.
+
+---
+
+## Beacon is not the operator
+
+Beacon can suggest, rank, and create task briefs.
+
+Beacon cannot approve work.
+
+Only the operator can approve:
+
+- product direction
+- schema/contract changes
+- new dependencies
+- feature cuts
+- demo flow changes
+- cross-agent tasks
+- behavior-changing implementation

@@ -1,0 +1,45 @@
+---
+description: Journal format and coordination rules
+alwaysApply: true
+---
+
+# Journal rules
+
+Each agent maintains:
+
+`agents-status/<codename>.md`
+
+Update it:
+
+- at session start
+- before stopping
+- when blocked
+- after shipping
+- after creating approval/proposal
+- after accepting/skipping Beacon task
+
+Use exactly this schema:
+
+```md
+## Now
+## Just shipped
+## Blocked / waiting on
+## Discussion needed
+## Approvals open
+## Proposals open
+## Next
+## Notes
+```
+
+Write `nothing` in empty sections.
+
+Never coordinate meaningful build state through private chat. Put it in journals, approvals, proposals, or task briefs.
+
+Use these prefixes:
+
+```txt
+[task] <agent>: <action>
+[approval] operator: <approval path>
+[setup] operator: <setup action>
+[launch] operator: <demo/launch action>
+```

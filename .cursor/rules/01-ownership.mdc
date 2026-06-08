@@ -1,0 +1,35 @@
+---
+description: Path ownership matrix
+alwaysApply: true
+---
+
+# Ownership rule
+
+Every coding agent may edit only its owned paths.
+
+If a change requires editing another owner's path, stop and create one of:
+
+- journal task for that owner
+- approval request
+- proposal
+- operator ask
+
+Do not perform drive-by edits in another owner’s path.
+
+---
+
+## Ownership matrix
+
+Replace with repo-specific paths.
+
+| Path | Owner | Notes |
+|---|---|---|
+| `apps/web/**` | `frontend` | UI |
+| `apps/api/**` | `backend` | API/backend |
+| `packages/types/**` | `operator` | frozen contracts |
+| `packages/mocks/**` | `agentkit` | mock fixtures |
+| `.github/**` | `ops` | CI |
+| `.cursor/rules/**` | `operator` | persistent rules |
+| `agents-status/<codename>.md` | `<codename>` | own journal only |
+| `agents-status/proposals/**` | shared protocol | author creates, operator decides |
+| `agents-status/approvals/**` | shared protocol | requester creates, operator decides |

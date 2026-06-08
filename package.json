@@ -1,0 +1,29 @@
+{
+  "name": "multi-agent-loop-kit",
+  "version": "0.5.0",
+  "description": "Markdown-first operating model for human-supervised parallel AI coding agents with a Beacon loop layer.",
+  "scripts": {
+    "agents": "bash tools/list-agents.sh",
+    "status": "bash tools/loop/status.sh",
+    "spawn": "bash tools/spawn-agent.sh",
+    "standup": "bash tools/standup.sh",
+    "loop:scan": "bash tools/loop/scan.sh",
+    "loop:radar": "bash tools/loop/radar.sh",
+    "loop:approvals": "bash tools/loop/approvals.sh",
+    "loop:listen": "bash tools/loop/listen.sh",
+    "loop": "bash tools/loop/status.sh && bash tools/loop/scan.sh && bash tools/loop/radar.sh && bash tools/standup.sh",
+    "bootstrap": "bash scripts/bootstrap.sh",
+    "ownership:check": "bash tools/check-ownership.sh",
+    "build:all-in-one": "bash tools/build-all-in-one.sh"
+  },
+  "keywords": [
+    "ai-agents",
+    "multi-agent",
+    "worktrees",
+    "cursor",
+    "claude-code",
+    "codex",
+    "human-in-the-loop"
+  ],
+  "license": "MIT"
+}

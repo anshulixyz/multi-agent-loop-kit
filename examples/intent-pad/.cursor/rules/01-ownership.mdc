@@ -1,0 +1,29 @@
+---
+description: Intent Pad path ownership matrix
+alwaysApply: true
+---
+
+# Intent Pad ownership
+
+Agents must not edit outside their owned paths.
+
+| Path | Owner |
+|---|---|
+| `apps/pad/**` | Anvil |
+| `apps/bus/**` | Conduit |
+| `packages/iaip-mocks/**` | Conduit |
+| `packages/bus-client/**` | Conduit |
+| `apps/agents/forager/**` | Forager |
+| `packages/agent-kit/**` | Forager |
+| `apps/agents/reel/**` | Reel |
+| `apps/cockpit/**` | Watchtower |
+| `packages/iaip-types/**` | Project Lead only |
+| `.cursor/rules/**` | Project Lead only |
+| `AGENTS.md` | Project Lead only |
+| `OPERATING_GUIDE.md` | Project Lead only |
+| `LOOP_RADAR.md` | Beacon drafts, Project Lead final objective |
+| `agents-status/<agent>.md` | That agent only |
+| `agents-status/proposals/**` | Authors create, Project Lead decides |
+| `agents-status/approvals/**` | Agents/Beacon create, Project Lead decides |
+
+Cross-boundary work requires a journal task, approval request, or proposal.

@@ -1,0 +1,12 @@
+---
+description: Ownership for web + api + shared-types
+alwaysApply: true
+---
+
+# Ownership
+
+- `web` owns `apps/web/**`
+- `api` owns `apps/api/**`
+- `packages/shared/**` is FROZEN — Project-Lead-gated, change via proposal only
+- No agent commits outside its owned paths.
+- Cross-boundary or contract change → proposal → Project Lead decision.

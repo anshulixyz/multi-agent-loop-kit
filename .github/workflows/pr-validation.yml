@@ -1,0 +1,123 @@
+name: PR validation
+
+# Minimal validation for the Multi-Agent Loop Kit conventions.
+#
+# What this enforces automatically (hard gate):
+#   - branch name follows  <codename>/<slug>
+#   - every commit subject follows  <codename>: <message>
+#   - PR body includes the required coordination sections
+#
+# What it assists with (not a hard gate):
+#   - lists the files this PR changed, so a human reviewer can check them
+#     against the ownership table in AGENTS.md.
+#
+# Path-ownership is intentionally NOT auto-enforced here. AGENTS.md is the
+# single source of truth for ownership; parsing it into a second machine
+# format would create drift. If your team wants hard ownership enforcement,
+# add a machine-readable ownership map and extend the "ownership-review" job.
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  conventions:
+    name: Branch, commit, and PR-body conventions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate branch name
+        run: |
+          branch="${{ github.head_ref }}"
+          echo "Branch: $branch"
+          # Allow the operator working directly on main.
+          if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+            echo "Operator branch, skipping codename check."
+            exit 0
+          fi
+          if echo "$branch" | grep -Eq '^[a-z][a-z0-9]*/[a-z0-9._/-]+$'; then
+            echo "✅ Branch follows <codename>/<slug>."
+          else
+            echo "::error::Branch '$branch' must follow <codename>/<slug>, e.g. frontend/demo-intent-capture."
+            exit 1
+          fi
+
+      - name: Validate commit message prefixes
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          # Allowed prefixes: agent codenames use lowercase letters/digits.
+          # Generic prefixes below let external contributors land docs/chores
+          # without inventing a codename. Add your own codenames as needed.
+          generic='^(docs|chore|ci|example|test|build|fix|refactor): .+'
+          codename='^[a-z][a-z0-9]*: .+'
+          fail=0
+          while IFS= read -r subject; do
+            # Skip merge commits.
+            case "$subject" in
+              "Merge "*) continue ;;
+            esac
+            if echo "$subject" | grep -Eq "$generic" || echo "$subject" | grep -Eq "$codename"; then
+              echo "✅ $subject"
+            else
+              echo "::error::Commit subject must follow '<prefix>: <message>'."
+              echo "::error::Use an agent codename (frontend:, backend:, ...) or a"
+              echo "::error::generic prefix (docs:, chore:, ci:, fix:, ...). Offending: $subject"
+              fail=1
+            fi
+          done < <(git log --no-merges --format='%s' "$base".."$head")
+          exit $fail
+
+      - name: Validate PR body has coordination sections
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          missing=0
+          require() {
+            if echo "$PR_BODY" | grep -iq "$1"; then
+              echo "✅ found: $1"
+            else
+              echo "::error::PR body is missing a required section mentioning: $1"
+              missing=1
+            fi
+          }
+          # These mirror .github/pull_request_template.md.
+          require "owned paths"
+          require "tests"
+          require "coordination"
+          if [ "$missing" -ne 0 ]; then
+            echo "Use .github/pull_request_template.md as the PR body."
+            exit 1
+          fi
+
+  ownership-review:
+    name: Changed files for ownership review (advisory)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List changed files for human review
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          {
+            echo "## Files changed by this PR"
+            echo ""
+            echo "Reviewer: confirm every file below is inside the agent's owned"
+            echo "paths in AGENTS.md, or that the PR links an approval/proposal."
+            echo ""
+            echo '```'
+            git diff --name-only "$base" "$head"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

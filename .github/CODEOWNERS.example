@@ -1,0 +1,30 @@
+# CODEOWNERS example for Multi-Agent Loop Kit
+# Copy this to .github/CODEOWNERS and replace owners with real GitHub handles.
+
+# Project Lead-owned governance files
+/AGENTS.md                    @repo-owner
+/RUNBOOK.md                   @repo-owner
+/MULTI_AGENT_WORKFLOW.md      @repo-owner
+/LOOP_SYSTEM.md               @repo-owner
+/.cursor/rules/               @repo-owner
+/agents-status/proposals/     @repo-owner
+
+# Beacon-owned coordination files, still reviewed by the Project Lead
+/LOOP_RADAR.md                @repo-owner
+/LOOP_MEMORY.md               @repo-owner
+/agents-status/task-briefs/   @repo-owner
+/agents-status/approvals/     @repo-owner
+/tools/loop/                  @repo-owner
+
+# Example coding-agent ownership
+/apps/web/                    @frontend-owner
+/apps/api/                    @backend-owner
+/packages/agent-kit/          @agentkit-owner
+/packages/mocks/              @agentkit-owner
+/.github/                     @ops-owner @repo-owner
+/infra/                       @ops-owner @repo-owner
+/scripts/                     @ops-owner @repo-owner
+
+# Frozen contracts should be reviewed by the Project Lead
+/packages/types/              @repo-owner
+/packages/contracts/          @repo-owner
