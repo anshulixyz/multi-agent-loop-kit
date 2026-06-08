@@ -1,36 +1,86 @@
 # Multi-Agent Loop Kit
 
-**An agent-native setup kit for turning a well-scoped repo into a supervised
-multi-agent coding loop.** A markdown + bash protocol that lets an AI agent
-configure your existing repo for parallel coding agents, Beacon loop planning,
-approval-gated task briefs, worktree isolation, journals, PRs, and safe
-auto-mode.
+**Stop prompting coding agents one task at a time. Give your repo a loop.**
 
-It is **not** unattended autonomy. It's structured, human-approved auto-mode for
-repos with clear specs and separable work.
+Multi-Agent Loop Kit is a markdown + bash protocol that helps an AI agent turn
+your existing repo into a supervised multi-agent coding loop.
 
-**The pitch in one line:** set your agents up once, then a loop feeds them
-ongoing work — instead of you re-prompting them every few minutes. This is a kit
-for *building multi-agent loops*, not for babysitting agents.
+It gives your repo:
 
-**Three modes, building on each other:**
+- **Beacon** — a loop-planning agent that watches repo state and ranks what
+  matters next
+- **coding agents** — repo-specific agents with owned paths, prompts, journals,
+  and worktrees
+- **task briefs** — small, approval-gated units of work
+- **approval gates** — the Project Lead approves before agents build
+- **safe auto-mode** — approved agents keep working through numbered slices until
+  a stop condition (see [`docs/AUTO_MODE.md`](docs/AUTO_MODE.md))
+- **journals + PR discipline** — status, blockers, and decisions written down
+  instead of lost in chat
 
-1. **Setup mode** — an agent reads your repo, interviews you, and configures the
-   kit (ownership, prompts, radar) for your project.
-2. **Loop mode** — Beacon reads repo state and proposes the next work; agents
-   claim approved tasks; you approve; they build and PR.
-3. **Safe auto-mode** — approved agents keep working through their owned, numbered
-   slices until a stop condition, without you re-prompting each step.
+It is **not** unattended autonomy. It is structured, human-approved auto-mode
+for repos with clear specs and separable work.
 
-It is **not** unattended autonomy. It's a repo protocol that gives agents enough
-structure to work continuously under your approval. See
-[`docs/AUTO_MODE.md`](docs/AUTO_MODE.md) for exactly what "safe auto-mode" allows
-and forbids.
+```txt
+Beacon watches the repo.
+Coding agents listen.
+You approve.
+They build.
+The loop continues.
+```
 
-> Works with Cursor, Claude Code, Codex, Windsurf, or any AI tool that can read
-> repo files and follow a prompt. No daemon and no runtime dependency — the kit
-> is markdown + bash. The `package.json` shortcuts (`bun run …`) are optional
-> conveniences; every command also runs directly as `bash tools/…`. MIT.
+```txt
+Beacon sees what matters next
+        ↓
+agents claim owned work
+        ↓
+Project Lead approves
+        ↓
+agents build in worktrees
+        ↓
+tests + PR + journals
+        ↓
+Beacon learns and loops again
+```
+
+## Why loops, not prompts?
+
+Most AI coding still works like this:
+
+```txt
+you prompt
+agent works
+agent stops
+you inspect
+you prompt again
+agent forgets context
+you re-explain
+```
+
+That does not scale when you are running multiple agents across a real repo.
+
+This kit changes the unit of work from a prompt to a loop:
+
+```txt
+repo state → Beacon radar → task brief → approval → agent worktree → PR → journal → next loop
+```
+
+You still stay in control. You just stop babysitting every step.
+
+> **Prompting is manual. Loops are operational.**
+
+## Three modes
+
+1. **Setup mode** — an agent reads your repo, interviews you, and proposes the
+   multi-agent setup.
+2. **Loop mode** — Beacon reads repo state, ranks next work, and creates task
+   briefs.
+3. **Safe auto-mode** — approved agents keep working through their owned,
+   numbered slices until a stop condition.
+
+Works with Cursor, Claude Code, Codex, Windsurf, or any AI coding tool that can
+read repo files and follow prompts. No daemon. No runtime dependency. Markdown +
+bash. MIT.
 
 ---
 
@@ -192,6 +242,23 @@ isn't. (`PROTOCOL.md` has the full "when this fits" discussion.)
 > This kit may work very well for your repo, or it may not. It works for my own
 > AI/product projects because the work can be planned, partitioned, reviewed, and
 > looped with human approval.
+
+## When this works best
+
+This works best when:
+
+- the repo has a clear PRD, spec, or roadmap
+- work can be split by path
+- contracts or shared types are known
+- agents can run tests before PR
+- a human is willing to approve task briefs and review PRs
+
+It works badly when:
+
+- the product direction changes every hour
+- every task touches the whole repo
+- there are no tests or specs
+- you want unattended autonomy
 
 ---
 
