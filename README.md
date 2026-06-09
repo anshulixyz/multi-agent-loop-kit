@@ -155,8 +155,6 @@ its own git worktree. Nothing runs autonomously — you approve every build.
 Easiest way to learn the kit is on a fresh repo where nothing can conflict.
 
 ```bash
-# Option 1: click "Use this template" on GitHub, then clone your new repo.
-# Option 2: clone this kit directly:
 git clone https://github.com/anshulixyz/multi-agent-loop-kit.git my-loop-repo
 cd my-loop-repo
 # optional: npx degit anshulixyz/multi-agent-loop-kit my-loop-repo  (history-free copy)
