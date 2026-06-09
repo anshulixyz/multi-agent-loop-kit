@@ -155,10 +155,11 @@ its own git worktree. Nothing runs autonomously — you approve every build.
 Easiest way to learn the kit is on a fresh repo where nothing can conflict.
 
 ```bash
-# use this repo as a GitHub template ("Use this template"), or clone it:
-git clone <KIT_REPO_URL> my-loop-repo
+# Option 1: click "Use this template" on GitHub, then clone your new repo.
+# Option 2: clone this kit directly:
+git clone https://github.com/anshulixyz/multi-agent-loop-kit.git my-loop-repo
 cd my-loop-repo
-# optional: `npx degit <KIT_REPO_URL> my-loop-repo` for a history-free copy
+# optional: npx degit anshulixyz/multi-agent-loop-kit my-loop-repo  (history-free copy)
 ```
 
 Then point your agent at `prompts/setup-interview.md` (see above) and follow the
@@ -166,14 +167,24 @@ interview.
 
 ### B. Existing repo
 
-Use the safe installer — it never overwrites your files (collisions are saved as
-`<name>.loopkit` to merge, and your `package.json` is left alone):
+First clone the kit once, then run its safe installer against your project — it
+never overwrites your files (collisions are saved as `<name>.loopkit` to merge,
+and your `package.json` is left alone):
 
 ```bash
-bash /path/to/kit/scripts/install-into-repo.sh /path/to/your-repo
+# 1. clone the kit somewhere (once)
+git clone https://github.com/anshulixyz/multi-agent-loop-kit.git ~/multi-agent-loop-kit
+
+# 2. install it into your project
+bash ~/multi-agent-loop-kit/scripts/install-into-repo.sh /path/to/your-repo
+
+# 3. go into your repo and run bootstrap
+cd /path/to/your-repo
+bash scripts/bootstrap.sh
 ```
 
-See **[Will it conflict with my repo?](#will-it-conflict-with-my-repo)** below.
+Then point your agent at `prompts/setup-interview.md` to configure agents for
+your repo. See **[Will it conflict with my repo?](#will-it-conflict-with-my-repo)** below.
 
 ---
 
