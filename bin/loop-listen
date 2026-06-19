@@ -4,7 +4,9 @@
 KIT="${CLAUDE_PLUGIN_ROOT:-$(cd -P "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 # Loop journals/radar live in the operator's PRIMARY checkout. Reading a linked
 # worktree (or a subdirectory) would show stale/partial state, so cd to the main
-# worktree first. Fall back to the current dir when not inside a git repo.
-REPO="$(git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2; exit}')"
+# worktree first. Take everything after "worktree " so paths with spaces survive;
+# the first porcelain entry is always the main worktree. Fall back to CWD when not
+# inside a git repo.
+REPO="$(git worktree list --porcelain 2>/dev/null | sed -n 's/^worktree //p' | head -1)"
 [ -n "$REPO" ] && cd "$REPO"
 exec bash "$KIT/tools/loop/listen.sh" "$@"

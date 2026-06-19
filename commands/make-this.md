@@ -14,7 +14,9 @@ Turn the current repository into a supervised multi-agent loop.
 
    It never overwrites existing files — on any collision it writes a `<name>.loopkit`
    copy beside yours and lists it. Read that output and tell the user which files (if
-   any) need a manual merge, **especially `AGENTS.md`**.
+   any) need a manual merge, **especially `AGENTS.md`**. (A *relative* target path is
+   resolved from the repo root, not your current subdirectory; use an absolute path if
+   you mean somewhere else.)
 
 2. Then run the setup interview. Read `${CLAUDE_PLUGIN_ROOT}/prompts/setup-interview.md`
    and follow it: inspect this repo, interview the user about agents/ownership/goals, and
