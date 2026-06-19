@@ -1,0 +1,71 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/>
+<title>Intro — Claude chat</title>
+<style>
+:root{--bg:#262320;--panel:#2f2b27;--border:#403a33;--text:#f2ede4;--dim:#a89c8a;
+--clay:#d97757;--green:#7fb37a;--amber:#e0a458;--blue:#7fa6d9;--purple:#b896d6;--teal:#5fc5b8;
+--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+--sans:-apple-system,"Segoe UI",Inter,system-ui,sans-serif;}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:radial-gradient(900px 600px at 50% -10%,#34302a,var(--bg) 70%);color:var(--text);
+font-family:var(--sans);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:26px}
+.app{width:min(760px,100%);background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;
+box-shadow:0 30px 80px -30px #000}
+.top{display:flex;align-items:center;gap:9px;padding:13px 16px;border-bottom:1px solid var(--border)}
+.logo{width:22px;height:22px;border-radius:6px;background:var(--clay);display:grid;place-items:center;font-size:13px}
+.top .name{font-weight:700;font-size:14px}.top .sub{color:var(--dim);font-size:12px;margin-left:auto}
+.chat{padding:20px 18px;height:470px;overflow:hidden;display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;gap:11px;opacity:0;transform:translateY(6px);animation:rise .3s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.av{width:28px;height:28px;border-radius:7px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700}
+.av.u{background:#46413a;color:var(--text)}
+.av.c{background:var(--clay);color:#1a120e}
+.bub{font-size:14.5px;line-height:1.6}
+.u .bub{color:var(--text)}
+.c .bub{color:var(--text)}
+.c .bub b{color:#fff}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:700;font-family:var(--mono)}
+.tag{font-family:var(--mono);font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12.5px;
+border:1px solid var(--border);border-radius:8px;padding:3px 9px;margin:3px 5px 0 0;opacity:0;transform:translateY(4px);animation:rise .3s ease forwards}
+.dot{width:8px;height:8px;border-radius:50%}
+.fe{background:var(--blue)}.be{background:var(--purple)}.an{background:var(--teal)}.bn{background:var(--amber)}
+.ok{color:var(--green)}.dim{color:var(--dim)}
+.typing{display:inline-flex;gap:4px;padding:4px 0}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--dim);animation:bounce 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+</style></head><body>
+<div class="app">
+  <div class="top"><div class="logo">✳</div><div class="name">Claude Code</div><div class="sub">loop plugin · ~/app</div></div>
+  <div class="chat" id="chat"></div>
+</div>
+<script>
+const chat=document.getElementById('chat');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function msg(role,inner){const m=document.createElement('div');m.className='msg '+role;
+  m.innerHTML=`<div class="av ${role==='u'?'u':'c'}">${role==='u'?'You':'✳'}</div><div class="bub">${inner}</div>`;
+  chat.appendChild(m);chat.scrollTop=chat.scrollHeight;return m;}
+async function typing(){const m=msg('c','<span class="typing"><i></i><i></i><i></i></span>');await sleep(900);return m;}
+async function run(){
+  window.__done=false;
+  msg('u','Set up a supervised multi-agent loop in this repo.');await sleep(900);
+  const t=await typing();
+  t.querySelector('.bub').innerHTML=
+    'On it. I\'ll split the repo into <b>git worktrees</b> — one per agent, each owning a slice — and keep you in the approval loop.';
+  await sleep(1400);
+  const m=msg('c','<span class="tag dim">/loop:make-this · /loop:spawn …</span><br>');
+  const b=m.querySelector('.bub');
+  await sleep(500);
+  b.innerHTML+='<div style="margin-top:8px"><span class="ok">✔</span> installed <b>loop</b> · enabled</div>';await sleep(700);
+  const chips=document.createElement('div');chips.style.marginTop='8px';b.appendChild(chips);
+  const data=[['fe','frontend','src/ui/**'],['be','backend','src/api/**'],['an','anvil','db/**']];
+  for(const [c,n,p] of data){const e=document.createElement('span');e.className='chip';
+    e.innerHTML=`<span class="dot ${c}"></span>${n} <span class="dim">· ${p}</span>`;chips.appendChild(e);await sleep(500);}
+  await sleep(700);
+  msg('c','Three agents are working in parallel. <b>backend</b> hit the frozen <span class="tag">/orders</span> contract and filed approval <b>001</b> — it\'s waiting on you.');
+  await sleep(1500);
+  msg('u','Show me the board.');await sleep(800);
+  msg('c','<span class="tag dim">❯ /loop:status</span> → <b>3 agents · 2 idle · 1 blocked</b>. <span class="dim">backend needs your sign-off.</span>');
+  await sleep(1800);window.__done=true;
+}
+window.addEventListener('load',()=>setTimeout(run,150));
+</script></body></html>
