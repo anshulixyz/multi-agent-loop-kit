@@ -43,18 +43,6 @@ tests + PR + journals
 Beacon learns and loops again
 ```
 
-## See it in motion
-
-**▶ [Watch the reel](docs/demo-clips/loop-reel.mp4)** (with sound), or scan the scenes:
-
-| | |
-|---|---|
-| **Ask Claude to set it up** — install the plugin, spawn agents.<br>![intro](docs/demo-clips/intro-chat.gif) | **One repo → many worktrees** — each agent isolated.<br>![worktrees](docs/demo-clips/scene1-worktrees.gif) |
-| **Agents work in parallel** — one Claude Code window each.<br>![agents](docs/demo-clips/agents-grid.gif) | **You approve — then it ships** — the real operator flow.<br>![operator](docs/demo-clips/operator-cli.gif) |
-
-> Everything above is the actual Claude Code UI driving the real `loop` commands on a
-> sample "multi-currency /orders" feature split across three agents.
-
 ## Why loops, not prompts?
 
 Most AI coding still works like this:

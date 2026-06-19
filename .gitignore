@@ -21,3 +21,6 @@ coverage/
 
 # optional local work
 .local/
+
+# demo / marketing media — kept locally, not shipped in the repo
+docs/demo-clips/
