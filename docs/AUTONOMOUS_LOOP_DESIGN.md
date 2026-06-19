@@ -53,42 +53,88 @@ worktree dir + the agent prompt), then watches journals/PRs and never edits code
 - **Verdict:** the right shape if the goal is genuine autonomy without losing the
   safety model. It's a real feature, not a skill — closer to a daemon.
 
-## Proposed first step (smallest thing that's actually useful)
+## Why not Option A, even "scoped" (a correction)
 
-Ship **Option A, scoped to pre-approved briefs only**, as a new skill
-`skills/run-approved-briefs/`:
+An earlier draft of this doc proposed shipping **Option A scoped to pre-approved
+briefs** as the smallest useful step. On review that's wrong, and the reason is worth
+stating plainly because it's easy to get backwards:
+
+**In this kit, isolation is a physical property, not an instruction.** It exists
+because each agent is a *separate process* with a *separate working directory* and a
+*separate permission grant*, watched in a *separate window*. Option A's fan-out
+subagents share one session's context and — critically — one permission grant. A tool
+permission the operator approved for agent A's task is live for agent B. So:
+
+- **"Worktree pinning" via a prompt rule is wishful.** "Write only inside your owned
+  paths" is an instruction the agent can ignore, exceed, or be argued out of — the
+  exact trust-the-agent model the kit *forbids* for self-approval, smuggled back in for
+  self-confinement. Real pinning needs OS-level confinement (a process that literally
+  cannot write outside its dir, or a non-overridable pre-write reject hook), which
+  fan-out-in-one-session does not give you.
+- **"Pre-approved briefs only" gates entry, not blast radius.** Requiring
+  `Status: APPROVED` before dispatch genuinely prevents auto-approving *new* work —
+  keep that. But an approved brief authorizes a *bounded change in owned paths*; it does
+  not bound what the agent emits once running, and in fan-out there's no human watching
+  that window in real time.
+
+So Option A doesn't *weaken* isolation; it removes the mechanism that produced it. It's
+acceptable only for a throwaway, fully-sandboxed batch — not as the steady-state loop.
+
+## Proposed first step: Option B, scoped to pre-approved briefs
+
+Ship a **supervisor**, as a *separate opt-in plugin* (not this one — see below), that
+keeps process-per-agent:
 
 1. Read `LOOP_RADAR.md` + `agents-status/task-briefs/*` and select only briefs whose
    matching approval in `agents-status/approvals/` is **already** `Status: APPROVED`.
-   Anything not pre-approved is skipped and listed — never auto-approved.
+   Anything not pre-approved is skipped and **logged loudly** — never auto-approved.
 2. For each selected brief: ensure the agent's worktree exists (reuse `spawn-agent.sh`),
-   then run one coding agent **pinned to that worktree path**, handed the brief + the
-   agent's prompt + a hard rule: *write only inside your owned paths; if you hit an
-   unapproved boundary, write an approval request and stop.*
-3. Collect each agent's journal write + open a PR per branch. Never merge.
+   then launch a **separate `claude -p` headless run, pinned to that worktree directory
+   with its own permission scope** — not a subagent in the supervisor's session. The
+   per-process working dir is the OS-level confinement Option A lacks.
+3. Collect each agent's journal write + open a PR per branch. **Never merge.**
 4. Emit a single operator briefing (reuse the `/loop:tick` synthesis) and **stop** —
    handing control back to the human for merges and any new approvals.
 
-This keeps the invariant (no self-approve, no self-merge, PR-gated) while removing the
-"open N windows by hand" cost for work the operator already blessed. It's the 80/20:
-the tedious part (dispatching approved work) is automated; the dangerous part
-(approving, merging, crossing boundaries) stays human.
+This gets the 80/20 the kit actually wants (automate dispatch of already-blessed work)
+*without* surrendering the isolation primitive: one agent = one process = one working
+dir = one permission grant, and a supervisor that is structurally incapable of editing
+code or approving anything. "More moving parts" (process lifecycle, log capture) is the
+price of the safety mechanism, not overhead to optimize away.
 
 ### Guardrails any version must enforce
-- **No auto-approval.** The orchestrator may *read* approval state, never write it.
-- **Worktree pinning.** Every agent process is constrained to its worktree dir;
-  writes outside owned paths are rejected, not merged.
-- **PR-gated.** Output is always a branch + PR a human merges, never a push to the
-  base branch.
-- **Loud truncation.** If the run caps agents or skips briefs, it says so — silent
-  caps read as "did everything" when it didn't.
-- **Stale = stop, not retry-forever.** A wedged agent surfaces on the board; it does
-  not get silently respawned in a loop.
+- **No auto-approval.** The supervisor may *read* approval state, never write it.
+- **Process-level confinement.** Each agent runs as its own process pinned to its
+  worktree dir with its own permission grant — not a shared-session subagent.
+- **PR-gated.** Output is always a branch + PR a human merges, never a push to base.
+- **Loud truncation.** If the run caps agents or skips briefs, it says so.
+- **Stale = stop, not retry-forever.** Define the detector and clock explicitly
+  (reuse `LOOP_STALE_HOURS` from `status.sh`); a wedged agent surfaces, it is not
+  silently respawned in a loop.
 
-## Open questions for review
-1. Is Option A-scoped-to-approved a safe enough default, or does sharing one session's
-   permissions across fan-out subagents already break the isolation promise too much?
-2. Worktree pinning for subagents — enforceable today via tooling, or does it need a
-   per-agent sandbox we don't have?
-3. Should the autonomy layer live in *this* plugin, or as a separate opt-in plugin so
-   the default install stays strictly human-in-the-loop?
+### Failure modes to design for (mostly absent in the Option-A framing)
+- **Shared-file contention.** N agents + the supervisor read/write `LOOP_RADAR.md`,
+  journals, and approval files; coordination is last-writer-wins markdown with no
+  locking. Concurrent journal writes interleave. Give each agent its own file and
+  never let two processes write the same one.
+- **Approval-file races.** Agents create approval requests with numeric prefixes
+  (`001-…`); N concurrent creators can collide on the same prefix. Need atomic
+  allocation (e.g. content-hash or UUID names, not sequential ints).
+- **All-blocked deadlock.** If every agent stops on an unapproved boundary, the
+  supervisor has nothing to collect and no human is in the loop. Detect "all agents
+  blocked" and exit to the human — don't spin.
+- **Context / cost blowup.** Per-process runs avoid the shared-context-window
+  exhaustion of fan-out, but still need a per-agent token/cost budget and a kill
+  switch; name them.
+- **Partial-dispatch state.** The run can die after opening 3 of 6 PRs. Make dispatch
+  idempotent/resumable (skip briefs whose branch+PR already exist).
+
+## Resolved questions
+1. *Is Option A-scoped-to-approved safe enough?* **No** — sharing one session's
+   permission scope across fan-out agents breaks isolation regardless of "pinning."
+   Use Option B (process-per-agent).
+2. *Is worktree pinning enforceable for subagents?* **Not via instruction.** It needs
+   OS-level per-process confinement, which Option B provides and Option A does not.
+3. *In this plugin or a separate one?* **Separate, opt-in plugin.** The default install
+   must stay strictly human-in-the-loop; autonomy is an explicit, separately-installed
+   choice.

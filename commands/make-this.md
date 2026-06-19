@@ -5,11 +5,11 @@ argument-hint: "[target-dir]"
 
 Turn the current repository into a supervised multi-agent loop.
 
-1. Run the installer against the target repo. Use the directory in `$ARGUMENTS` if the user
-   gave one, otherwise the current directory (`.`):
+1. Run the installer. With no argument it installs into your repo's primary checkout (safe
+   to run from a subdirectory); pass a path in `$ARGUMENTS` to target a different repo:
 
    ```
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/install-into-repo.sh" .
+   bash "${CLAUDE_PLUGIN_ROOT}/bin/loop-make-this" $ARGUMENTS
    ```
 
    It never overwrites existing files — on any collision it writes a `<name>.loopkit`
@@ -24,5 +24,3 @@ Turn the current repository into a supervised multi-agent loop.
 Do not skip the interview — installation only copies the scaffolding; the interview is what
 adapts it to this repo. If the repo is not a git repository, point out that the kit relies on
 git worktrees and offer to run `git init`.
-
-(If the plugin's `bin/` is on your PATH, `loop-make-this` is a shorthand for step 1.)

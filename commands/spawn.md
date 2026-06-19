@@ -5,10 +5,10 @@ argument-hint: "<codename> [slug] [base-branch]"
 
 Spawn a new coding agent for this repo.
 
-Run (passing the codename / slug / base-branch the user gave in `$ARGUMENTS`):
+Run, passing the codename / slug / base-branch the user gave in `$ARGUMENTS`:
 
 ```
-bash "${CLAUDE_PLUGIN_ROOT}/tools/spawn-agent.sh" $ARGUMENTS
+bash "${CLAUDE_PLUGIN_ROOT}/bin/loop-spawn" $ARGUMENTS
 ```
 
 This creates a sibling git worktree (`../<repo>-<codename>`) on branch `<codename>/<slug>`
@@ -20,4 +20,4 @@ before running. After it succeeds, relay the worktree path and branch, and remin
 open that path in their agent of choice and paste `prompts/<codename>.md` (or
 `prompts/coding-agent.md`).
 
-(Shorthand if the plugin's `bin/` is on your PATH: `loop-spawn <codename> [slug]`.)
+(If the plugin's `bin/` is on your PATH, `loop-spawn <codename> [slug]` is the same command.)

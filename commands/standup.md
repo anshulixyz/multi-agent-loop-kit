@@ -4,13 +4,14 @@ description: Generate a multi-agent standup — blockers, approvals, and what ne
 
 Generate the standup: what needs the operator's attention across all agents.
 
-Run from the repo root:
+Run (it resolves and writes into your primary checkout, so it won't litter derived files
+into a subdirectory or worktree):
 
 ```
-bash "${CLAUDE_PLUGIN_ROOT}/tools/standup.sh"
+bash "${CLAUDE_PLUGIN_ROOT}/bin/loop-standup"
 ```
 
 Relay the standup. Lead with anything blocked or awaiting approval — that's the operator's
 queue. `/loop:status` answers "what is everyone doing"; this answers "what needs me".
 
-(Shorthand if the plugin's `bin/` is on your PATH: `loop-standup`.)
+(If the plugin's `bin/` is on your PATH, `loop-standup` is the same command.)

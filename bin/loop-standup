@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-# Resolve the plugin/kit root: prefer the env var Claude Code sets, else derive
-# from this script's own location (bin/ lives directly under the plugin root).
-KIT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+# Resolve the plugin/kit root: prefer the env var Claude Code sets, else derive from
+# this script's own location (-P resolves symlinks). bin/ lives under the plugin root.
+KIT="${CLAUDE_PLUGIN_ROOT:-$(cd -P "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+# Loop journals/radar live in the operator's PRIMARY checkout. Reading a linked
+# worktree (or a subdirectory) would show stale/partial state, so cd to the main
+# worktree first. Fall back to the current dir when not inside a git repo.
+REPO="$(git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2; exit}')"
+[ -n "$REPO" ] && cd "$REPO"
 exec bash "$KIT/tools/standup.sh" "$@"
