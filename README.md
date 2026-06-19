@@ -150,6 +150,20 @@ its own git worktree. Nothing runs autonomously — you approve every build.
 
 ## Quickstart
 
+**Which install should I use?**
+
+| You are… | Use | How |
+|---|---|---|
+| On **Claude Code** and want typed `/loop:*` commands | **Plugin** (C) | `/plugin marketplace add anshulixyz/multi-agent-loop-kit` then `/plugin install loop@multi-agent-loop-kit` |
+| On **Claude Code** and prefer the Agent Skills workflow | **Skill** (D) | clone into `~/.claude/skills/multi-agent-loop`, then ask Claude to "set up a multi-agent loop here" |
+| Using **Cursor / Codex / another agent** (no Claude Code) | **Clone-install** (A/B) | run `scripts/install-into-repo.sh` and point your agent at `prompts/setup-interview.md` |
+| Just **trying it out** | **New repo** (A) | clone the kit and explore on a throwaway repo |
+
+The plugin and skill are two faces of the same kit on Claude Code — pick by taste
+(namespaced commands vs one model-invocable skill). All paths wrap the same scripts.
+The skill/plugin run **locally**; they are not for the claude.ai/Desktop uploaded-skill
+sandbox (no local git worktrees there). Details for each below.
+
 ### A. New / empty repo (recommended starting point)
 
 Easiest way to learn the kit is on a fresh repo where nothing can conflict.
