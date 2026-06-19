@@ -184,6 +184,29 @@ bash scripts/bootstrap.sh
 Then point your agent at `prompts/setup-interview.md` to configure agents for
 your repo. See **[Will it conflict with my repo?](#will-it-conflict-with-my-repo)** below.
 
+### C. As a Claude Code plugin
+
+If you use [Claude Code](https://code.claude.com), the kit is also a plugin — the
+repo is its own single-plugin marketplace. Install it once and get the loop ops as
+namespaced slash commands:
+
+```text
+/plugin marketplace add anshulixyz/multi-agent-loop-kit
+/plugin install loop@multi-agent-loop-kit
+```
+
+Then, from inside any repo:
+
+- `/loop:make-this` — install the kit into the current repo and run the setup interview
+- `/loop:spawn <codename> [slug]` — spawn a coding agent in its own worktree + branch
+- `/loop:status` · `/loop:tick` — the status board / a full sweep (status → scan → radar → standup)
+- `/loop:standup` · `/loop:approvals` — the operator's decision queue
+- `/loop:radar` · `/loop:scan` · `/loop:listen <codename>` · `/loop:agents` · `/loop:ownership` — the rest of the loop ops
+
+The plugin is purely additive — it wraps the same scripts as the clone-install above,
+so both paths stay valid. To hack on it locally before publishing: `claude --plugin-dir .`
+from this repo, then `/loop:status`. Validate manifests with `claude plugin validate .`.
+
 ---
 
 ## Running it & seeing status

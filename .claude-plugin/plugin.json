@@ -1,0 +1,20 @@
+{
+  "name": "loop",
+  "version": "0.5.0",
+  "description": "Turn any repo into a supervised multi-agent loop: spawn parallel coding agents in git worktrees, track them on a radar, and keep a human in the approval loop.",
+  "author": {
+    "name": "Anshuli Gupta",
+    "email": "anshulixyz@gmail.com",
+    "url": "https://github.com/anshulixyz"
+  },
+  "homepage": "https://github.com/anshulixyz/multi-agent-loop-kit",
+  "repository": "https://github.com/anshulixyz/multi-agent-loop-kit",
+  "license": "MIT",
+  "keywords": [
+    "ai-agents",
+    "multi-agent",
+    "worktrees",
+    "human-in-the-loop",
+    "orchestration"
+  ]
+}

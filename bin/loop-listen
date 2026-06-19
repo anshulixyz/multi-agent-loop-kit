@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Resolve the plugin/kit root: prefer the env var Claude Code sets, else derive from
+# this script's own location (-P resolves symlinks). bin/ lives under the plugin root.
+KIT="${CLAUDE_PLUGIN_ROOT:-$(cd -P "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+# Loop journals/radar live in the operator's PRIMARY checkout. Reading a linked
+# worktree (or a subdirectory) would show stale/partial state, so cd to the main
+# worktree first. Take everything after "worktree " so paths with spaces survive;
+# the first porcelain entry is always the main worktree. Fall back to CWD when not
+# inside a git repo.
+REPO="$(git worktree list --porcelain 2>/dev/null | sed -n 's/^worktree //p' | head -1)"
+[ -n "$REPO" ] && cd "$REPO"
+exec bash "$KIT/tools/loop/listen.sh" "$@"
