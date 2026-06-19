@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Resolve the plugin/kit root: prefer the env var Claude Code sets, else derive
+# from this script's own location (bin/ lives directly under the plugin root).
+KIT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+exec bash "$KIT/tools/spawn-agent.sh" "$@"
