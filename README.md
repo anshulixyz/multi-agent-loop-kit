@@ -207,6 +207,28 @@ The plugin is purely additive — it wraps the same scripts as the clone-install
 so both paths stay valid. To hack on it locally before publishing: `claude --plugin-dir .`
 from this repo, then `/loop:status`. Validate manifests with `claude plugin validate .`.
 
+### D. As a Claude Code skill
+
+Prefer the [Agent Skills](https://code.claude.com/docs/en/skills) workflow? The repo
+root doubles as a self-contained skill — clone it into your skills directory:
+
+```bash
+git clone https://github.com/anshulixyz/multi-agent-loop-kit.git \
+  ~/.claude/skills/multi-agent-loop
+```
+
+That's it — Claude Code auto-discovers the `multi-agent-loop` skill (root
+[`SKILL.md`](SKILL.md)). In any repo, just ask Claude to "set up a multi-agent loop
+here" (or run it explicitly with `/multi-agent-loop`); the skill installs the kit, runs
+the setup interview, and drives the loop (status, spawn, standup, approvals) using the
+bundled scripts. Use project scope (`.claude/skills/multi-agent-loop/`) to share it
+with a repo's collaborators via git.
+
+> The skill runs **locally** (it needs your filesystem, git worktrees, and one editor
+> window per agent), so it targets Claude Code — not the claude.ai/Desktop uploaded-skill
+> sandbox. For namespaced `/loop:*` commands, use the plugin (C) instead; the skill is one
+> model-invocable entry point.
+
 ---
 
 ## Running it & seeing status
