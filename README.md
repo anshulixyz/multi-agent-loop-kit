@@ -375,6 +375,16 @@ The real value is seeing a repo structured for multiple agents. Two are included
 
 ---
 
+## Related
+
+- **[Agent Building Playbook](https://github.com/anshulixyz/agent-playbook)** — a
+  decision-first, vendor-neutral guide to designing a *single* agent well (autonomy
+  & pattern choice, the agent competencies, guardrails/security, benchmarking). This
+  kit is the *"coordinate **many** agents safely"* layer; the playbook is the
+  *"design **one** agent right"* layer — decide the agent there, scale it out here.
+
+---
+
 ## Contributing & license
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md). MIT licensed. Issues with your repo
