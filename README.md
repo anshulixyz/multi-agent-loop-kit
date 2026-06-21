@@ -377,7 +377,7 @@ The real value is seeing a repo structured for multiple agents. Two are included
 
 ## Related
 
-- **[Agent Building Playbook](https://github.com/anshulixyz/agent-playbook)** — a
+- **[Agent Groundwork](https://github.com/anshulixyz/agent-groundwork)** — a
   decision-first, vendor-neutral guide to designing a *single* agent well (autonomy
   & pattern choice, the agent competencies, guardrails/security, benchmarking). This
   kit is the *"coordinate **many** agents safely"* layer; the playbook is the
